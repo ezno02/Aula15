@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concessionária</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: 300ms ease-in-out;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 0 20px;
+        }
+
+        header {
+            opacity: 95%;
+            height: 70px;
+            background-color: #ffffff;
+            border-radius: 0.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: sticky;
+            margin: 10px auto;
+            max-width: 1200px;
+            top: 10px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header #logo {
+            height: 40px;
+        }
+
+        header #menu {
+            gap: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        header #menu a {
+            color: #333;
+            text-decoration: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.2rem;
+        }
+
+        header #menu a:hover {
+            background-color: #e0e0e0;
+            color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        header #menu input {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.2rem;
+            background-color: #fff;
+            color: #333;
+        }
+
+        main {
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+
+        /* Estilos do Carrossel */
+        #carrossel-container {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.4rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carrossel-slide {
+            display: none;
+            /* Inicialmente escondidos */
+            align-items: center;
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .carrossel-slide.ativo {
+            display: flex;
+            /* Exibe o slide ativo */
+        }
+
+        .carrossel-slide img {
+            max-width: 400px;
+            height: auto;
+            border-radius: 0.3rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .carrossel-info {
+            flex-grow: 1;
+        }
+
+        .carrossel-info h3 {
+            color: #c0392b;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .carrossel-info p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .carrossel-info .preco {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        /* Estilos da Seção Carros */
+        main #carros {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.4rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        main #carros h2 {
+            color: #c0392b;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        main #carros .content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        main .carro {
+            background-color: #f8f8f8;
+            border-radius: 0.4rem;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, opacity 0.5s, height 0.5s, margin 0.5s;
+        }
+
+        main .carro.hidden {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        main .carro:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        main .carro img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid #ddd;
+        }
+
+        main .carro h3,
+        main .carro p {
+            padding: 1rem;
+            text-align: center;
+            color: #333;
+        }
+
+        main .carro h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        main .carro p {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        main .carro .botoes {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1rem 1rem;
+        }
+
+        main .carro button {
+            flex-grow: 1;
+            padding: 0.8rem;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            border-radius: 0.2rem;
+            font-weight: bold;
+        }
+
+        main .carro button.comprar {
+            background-color: #c0392b;
+            margin-left: 0.5rem;
+        }
+
+        main .carro button.comprar:hover {
+            background-color: #e74c3c;
+        }
+
+        main .carro button.ver-detalhes {
+            background-color: #34495e;
+            margin-right: 0.5rem;
+        }
+
+        main .carro button.ver-detalhes:hover {
+            background-color: #44617c;
+        }
+
+        #noResultsMessage {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #95a5a6;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        /* Estilo da Seção Sobre */
+        main #sobre {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.4rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        main #sobre img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 0.3rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        main #sobre-content {
+            flex-grow: 1;
+        }
+
+        main #sobre-content h2 {
+            color: #c0392b;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            text-align: left;
+        }
+
+        main #sobre-content p {
+            line-height: 1.6;
+            text-align: justify;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        main #sobre-content strong {
+            color: #c0392b;
+        }
+
+        footer {
+            background-color: #ffffff;
+            color: #333;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            border-radius: 0.3rem;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 2rem auto 0;
+        }
+
+        footer .content p {
+            font-size: 0.9rem;
+        }
+
+        #backToTopBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
+            background-color: #c0392b;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s ease-in-out, background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #backToTopBtn.show {
+            opacity: 0.8;
+            pointer-events: auto;
+        }
+
+        #backToTopBtn:hover {
+            background-color: #e74c3c;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: stretch;
+                height: auto;
+                padding: 1rem;
+            }
+
+            header #logo {
+                margin: 0 auto 0.5rem;
+            }
+
+            header #menu {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+
+            header #menu input {
+                width: 100%;
+            }
+
+            main #sobre {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            main #sobre img {
+                max-width: 100%;
+            }
+
+            main #sobre-content h2 {
+                text-align: center;
+            }
+
+            .carrossel-slide {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .carrossel-slide img {
+                max-width: 100%;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 101;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            color: #333;
+            margin: 10% auto;
+            padding: 30px;
+            border: none;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-button {
+            color: #c0392b;
+            float: right;
+            font-size: 2.5rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #e74c3c;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #modelo-detalhe,
+        #ano-detalhe,
+        #km-detalhe {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_lossless,ret_img,w_1080,h_675/https://graphicdesignergeeks.com/wp-content/uploads/2024/03/HONDA-1-1080x628.jpg" alt="Logo da Concessionária"
+            id="logo">
+        <div id="menu">
+            <a href="#">Home</a>
+            <a href="#sobre">Sobre</a>
+            <a href="#carros">Carros</a>
+            <input type="text" id="searchInput" placeholder="Buscar carros...">
+        </div>
+    </header>
+    <main>
+        <section id="carrossel-container">
+            <div class="carrossel-slide ativo">
+                <img src="https://www.honda.com.br/automoveis/sites/hab/files/2023-05/12_2023_Civic_TypeR_0012_1096x720.jpg"
+                    alt="Honda Civic 2023">
+                <div class="carrossel-info">
+                    <h3>Honda Civic 2023</h3>
+                    <p>O Honda Civic é um sedan elegante e moderno, conhecido por sua dirigibilidade esportiva e tecnologia avançada.</p>
+                    <p class="preco">A partir de R$ 115.900,00</p>
+                </div>
+            </div>
+            <div class="carrossel-slide">
+                <img src="https://s2-autoesporte.glbimg.com/O9RND2Ip_PxSDX86muI4U8rWtnk=/0x0:620x413/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_cf9d035bf26b4646b105bd958f32089d/internal_photos/bs/2020/O/D/c4AwwtRMaWqcCUTDAcxQ/2019-05-29-hrvfrente.jpg"
+                    alt="Honda HR-V 2023">
+                <div class="carrossel-info">
+                    <h3>Honda HR-V 2023</h3>
+                    <p>O Honda HR-V é um SUV compacto com design arrojado, interior espaçoso e uma variedade de recursos de segurança e conveniência.</p>
+                    <p class="preco">A partir de R$ 108.300,00</p>
+                </div>
+            </div>
+            <div class="carrossel-slide">
+                <img src="https://www.minutoseguros.com.br/blog/wp-content/uploads/2022/06/honda-fit.jpeg"
+                    alt="Honda Fit 2023">
+                <div class="carrossel-info">
+                    <h3>Honda Fit 2023</h3>
+                    <p>O Honda Fit é um hatchback versátil e econômico, famoso por seu sistema de bancos Magic Seat e amplo espaço interno.</p>
+                    <p class="preco">A partir de R$ 86.700,00</p>
+                </div>
+            </div>
+            </section>
+        <section id="carros">
+            <h2>Nossos Modelos Honda</h2>
+            <div class="content">
+                <div class="carro" data-modelo="Honda Civic" data-ano="2023" data-km="0 km">
+                    <img src="https://www.honda.com.br/automoveis/sites/hab/files/2023-05/12_2023_Civic_TypeR_0012_1096x720.jpg"
+                        alt="Honda Civic 2023">
+                    <h3>Honda Civic 2023</h3>
+                    <p>A partir de R$ 115.900,00</p>
+                    <div class="botoes">
+                        <button class="ver-detalhes">Ver Detalhes</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+                <div class="carro" data-modelo="Honda HR-V" data-ano="2023" data-km="0 km">
+                    <img src="https://s2-autoesporte.glbimg.com/O9RND2Ip_PxSDX86muI4U8rWtnk=/0x0:620x413/984x0/smart/filters:strip_icc()/i.s3.glbimg.com/v1/AUTH_cf9d035bf26b4646b105bd958f32089d/internal_photos/bs/2020/O/D/c4AwwtRMaWqcCUTDAcxQ/2019-05-29-hrvfrente.jpg"
+                        alt="Honda HR-V 2023">
+                    <h3>Honda HR-V 2023</h3>
+                    <p>A partir de R$ 108.300,00</p>
+                    <div class="botoes">
+                        <button class="ver-detalhes">Ver Detalhes</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+                <div class="carro" data-modelo="Honda Fit" data-ano="2023" data-km="0 km">
+                    <img src="https://www.minutoseguros.com.br/blog/wp-content/uploads/2022/06/honda-fit.jpeg"
+                        alt="Honda Fit 2023">
+                    <h3>Honda Fit 2023</h3>
+                    <p>A partir de R$ 86.700,00</p>
+                    <div class="botoes">
+                        <button class="ver-detalhes">Ver Detalhes</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+                <div class="carro" data-modelo="Honda City" data-ano="2023" data-km="0 km">
+                    <img src="https://mlqt0se4pk9p.i.optimole.com/q:85/https://www.autodata.com.br/wordpress/wp-content/uploads//2022/09/HONDA-NEW-CITY-HATCHBACK-1-scaled.jpg"
+                        alt="Honda City 2023">
+                    <h3>Honda City 2023</h3>
+                    <p>A partir de R$ 97.800,00</p>
+                    <div class="botoes">
+                        <button class="ver-detalhes">Ver Detalhes</button>
+                        <button class="comprar">Comprar</button>
+                    </div>
+                </div>
+                </div>
+            <div id="noResultsMessage">
+                Nenhum carro encontrado.
+            </div>
+        </section>
+        <section id="sobre">
+            <img src="https://global.honda/content/dam/site/global/top/cq_img/cq_honda_logo.png/jcr:content/cq_img.img.png"
+                alt="Logo da História da Honda">
+            <div id="sobre-content">
+                <h2>Nossa História</h2>
+                <p>
+                    A <strong>Honda</strong> foi fundada por Soichiro Honda em 1948, no Japão. A paixão de Soichiro por mecânica e sua filosofia de "seguir os sonhos" são a base da empresa. Inicialmente, a Honda produzia motores para bicicletas, mas rapidamente expandiu seu foco para motocicletas.
+                </p>
+                <p>
+                    O sucesso veio com a motocicleta <strong>Super Cub</strong>, lançada em 1958, que se tornou um dos veículos mais vendidos da história, conhecida por sua confiabilidade e facilidade de uso. Esse sucesso permitiu que a empresa investisse no desenvolvimento de automóveis.
+                </p>
+                <p>
+                    A Honda entrou no mercado de automóveis nos anos 60, com destaque para modelos como o <strong>Honda Civic</strong> e o <strong>Honda Accord</strong>, que conquistaram o mundo com sua eficiência e design inovador. A empresa também se tornou uma potência nas corridas, especialmente na Fórmula 1 e nas competições de motocicletas.
+                </p>
+                <p>
+                    Hoje, a Honda é reconhecida mundialmente não apenas por seus carros, mas também por sua inovação em tecnologia e engenharia. A marca continua a buscar a excelência e a inspirar pessoas com o espírito de seu fundador.
+                </p>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="content">
+            <p>
+                Direitos de imagens reservados.
+            </p>
+        </div>
+    </footer>
+    <a href="#top">
+        <button id="backToTopBtn">&#x2191;</button>
+    </a>
+
+    <div id="detalhes-veiculo" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modelo-detalhe"></h3>
+            <p id="ano-detalhe"></p>
+            <p id="km-detalhe"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const detalhesVeiculoModal = document.getElementById('detalhes-veiculo');
+            const closeButton = detalhesVeiculoModal.querySelector('.close-button');
+            const verDetalhesBotoes = document.querySelectorAll('.ver-detalhes');
+            const modeloDetalhe = document.getElementById('modelo-detalhe');
+            const anoDetalhe = document.getElementById('ano-detalhe');
+            const kmDetalhe = document.getElementById('km-detalhe');
+            const searchInput = document.getElementById('searchInput');
+            const carros = document.querySelectorAll('.carro');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+
+            verDetalhesBotoes.forEach(button => {
+                button.addEventListener('click', function () {
+                    const carro = this.closest('.carro');
+                    const modelo = carro.dataset.modelo;
+                    const ano = carro.dataset.ano;
+                    const km = carro.dataset.km;
+                    modeloDetalhe.textContent = `Modelo: ${modelo}`;
+                    anoDetalhe.textContent = `Ano: ${ano}`;
+                    kmDetalhe.textContent = `Quilometragem: ${km}`;
+                    detalhesVeiculoModal.style.display = 'block';
+                });
+            });
+
+            closeButton.addEventListener('click', function () {
+                detalhesVeiculoModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', function (event) {
+                if (event.target === detalhesVeiculoModal) {
+                    detalhesVeiculoModal.style.display = 'none';
+                }
+            });
+
+            const backToTopBtn = document.getElementById('backToTopBtn');
+            const scrollThreshold = 300;
+
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > scrollThreshold) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            searchInput.addEventListener('keyup', function () {
+                const searchTerm = this.value.toLowerCase();
+                let resultsFound = false;
+
+                carros.forEach(carro => {
+                    const nomeCarro = carro.querySelector('h3').textContent.toLowerCase();
+                    const modeloCarro = carro.dataset.modelo.toLowerCase();
+                    const isVisible = nomeCarro.includes(searchTerm) || modeloCarro.includes(searchTerm);
+
+                    if (isVisible) {
+                        carro.classList.remove('hidden');
+                        resultsFound = true;
+                    } else {
+                        carro.classList.add('hidden');
+                    }
+                });
+
+                if (resultsFound) {
+                    noResultsMessage.style.display = 'none';
+                } else {
+                    noResultsMessage.style.display = 'block';
+                }
+            });
+
+            // Carrossel (Início)
+            const slides = document.querySelectorAll('.carrossel-slide');
+            let slideIndex = 0;
+
+            function mostrarSlide(n) {
+                slides.forEach(slide => slide.classList.remove('ativo'));
+                slides[(n + slides.length) % slides.length].classList.add('ativo');
+            }
+
+            function proximoSlide() {
+                slideIndex++;
+                mostrarSlide(slideIndex);
+            }
+
+            // Para transição automática, você pode usar setInterval
+            // setInterval(proximoSlide, 3000); // Troca de slide a cada 3 segundos
+
+            mostrarSlide(slideIndex); // Mostrar o primeiro slide ao carregar a página
+            // Carrossel (Fim)
+        });
+    </script>
+</body>
+
+</html>
